@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+</head>
+<body>
+    <h1>게시글 상세</h1>
+
+    <!-- 게시글 내용 출력 -->
+    <h2 th:text="${board.title}">제목</h2>
+    <p>작성자: <span th:text="${board.writer}">작성자</span></p>
+    <p>작성일: <span th:text="${board.createdDate}">작성일</span></p>
+    <p th:text="${board.content}">내용</p>
+
+    <!-- 좋아요/싫어요 버튼 및 카운트 -->
+    <!-- 
+    <div>
+        <form th:action="@{/board/{id}/like(id=${board.id})}" method="post">
+            <button type="submit">👍 좋아요 (<span th:text="${board.likes}">0</span>)</button>
+        </form>
+        <form th:action="@{/board/{id}/dislike(id=${board.id})}" method="post">
+            <button type="submit">👎 싫어요 (<span th:text="${board.dislikes}">0</span>)</button>
+        </form>
+    </div>
+     -->
+     <div>
+        <form th:action="@{/board/{id}/like(id=${board.id})}" method="post">
+         	<button type="submit">👍 좋아요 </button>
+        </form>
+        <form th:action="@{/board/{id}/dislike(id=${board.id})}" method="post">
+        	<button type="submit">👎 싫어요 </button>
+        </form>
+    </div>
+
+    <!-- 댓글 목록 출력 -->
+    <h3>댓글</h3>
+    <ul>
+        <!-- 댓글을 반복 출력 -->
+        <li th:each="review : ${reviews}">
+            <p th:text="${review.writer}">작성자</p>
+            <p th:text="${review.content}">댓글 내용</p>
+            <p th:text="${review.createdDate}">작성일</p>
+        </li>
+    </ul>
+
+    <!-- 댓글 작성 폼 -->
+    <form th:action="@{/board/{boardId}/comment(boardId=${board.id})}" method="post">
+        <div>
+            <label for="writer">작성자:</label>
+            <input type="text" id="writer" name="writer" required>
+        </div>
+        <div>
+            <label for="content">내용:</label>
+            <textarea id="content" name="content" required></textarea>
+        </div>
+        <button type="submit">댓글 작성</button>
+    </form>
+
+    <a href="/board/list">목록으로 돌아가기</a>
+</body>
+</html>

@@ -1,13 +1,13 @@
-package com.web.jk;
+package com.web.jkjk;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JkApplication {
+public class JkjkApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(JkApplication.class, args);
+		SpringApplication.run(JkjkApplication.class, args);
 	}
 
 }

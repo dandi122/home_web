@@ -1,0 +1,101 @@
+<div th:fragment="frag_index_content"  class="content-wrapper">
+	
+	<div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">게시글 상세보기</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active"><a href="/board/list">목록으로 돌아가기</a></li>                
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+ 	<section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 col-12">
+					<div class="container my-3">
+						<div class="card my-3">
+							<div class="card-header">
+								<h3 th:text="${ board.title}"></h3>
+							</div>
+							<div class="card-body">
+								<div class="card-text" th:text="${board.content}"></div>
+								
+								<div class="badge bg-light text-primary text-start" th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+								
+							</div>
+						</div>	
+						<!-- 여기부터 오류 잡아야 함...... -->
+						<!-- 수정, 삭제 버튼 추가 -->
+						<a th:href=# class="btn btn-success">수정</a>
+						<form method="delete" th:action=#>
+							<input type="submit" value="삭제" class="btn btn-danger">
+						</form>
+					</div>
+					<!-- 좋아요/싫어요 버튼 및 카운트 -->
+					<div>
+       					<form th:action="@{/board/{id}/like(id=${board.id})}" method="post">
+         					<button type="submit">👍 좋아요(<span th:text="${board.likes}">0</span>) </button>
+        				</form>
+        				<form th:action="@{/board/{id}/dislike(id=${board.id})}" method="post">
+        					<button type="submit">👎 싫어요(<span th:text="${board.dislikes}">0</span>) </button>
+        				</form>
+    				</div>
+					
+					<!-- 리뷰 등록 -->
+					<div class="container my-3">
+						<h3 class="border-bottom py-2 my-3"
+							th:text="${board.reviewCount} + '개'"></h3>
+						<h3 class="border-bottom py-2 my-3">리뷰 등록</h3>
+						
+						<form th:action="@{/board/{boardId}/comment(boardId=${board.id})}" method="post">
+							<!-- 
+							<div th:replace="~{lib/frag :: formErrorFrag}"></div>
+							 -->
+							<label for="writer">작성자:</label>
+            				<input type="text" id="writer" name="writer" required>
+            				<label for="content">내용:</label>
+            				<textarea id="content" name="content" required></textarea>
+							<button type="submit">댓글 작성</button>
+						</form>
+					</div>
+					
+					<!-- 리뷰 목록 노출 -->
+					<div class="container my-3">
+						<!-- 실습 5분, 리뷰 내용, 작성시간을 리스트로 표현하시오 -->
+						
+						<div class="card my-3 bg-warning" th:each="review : ${reviews}">
+							<div class="card-body">	
+								<!-- 			
+								<div class="card-text">
+									[[ |${ review.content} - 
+									    ${ #temporals.format( review.getCreateDate(), 'yyyy-MM-dd HH:mm:ss')  }|  ]]
+								</div>
+								 -->
+								 <div class="card-text" th:text="${review.writer} + '-' + ${review.content} + '-' + ${ #temporals.format( review.CreateDate, 'yyyy-MM-dd HH:mm:ss') }">
+								</div>
+								 
+							</div>
+							<div class="card-footer">
+								<a th:href="#" class="btn btn-info">수정</a>
+								<a th:href="#" class="btn btn-danger">삭제</a>
+							</div>
+							
+						</div>
+						
+					</div>
+						
+
+
+			</div>
+		  </div>
+	    </div>
+    </section>
+</div>
+	

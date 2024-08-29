@@ -44,7 +44,7 @@ public class BoardService {
         return new BoardDTO().toEntity(board);
     }
     
-    // 모든 게시글을 조회하고, BoardDTO 리스트로 변환하여 반환합니다.
+    // 모든 게시글을 조회하고, BoardDTO 리스트로 변환하여 반환
     @Transactional
     public List<BoardDTO> findAll() {
         return boardRepository.findAll().stream()
@@ -55,7 +55,7 @@ public class BoardService {
     // 댓글 저장 메서드
     @Transactional
     public Long saveComment(ReviewDTO reviewDTO) {
-        Board board = boardRepository.findById(reviewDTO.getBoardId()).orElseThrow(() -> new IllegalArgumentException("No such board post"));
+        Board board = boardRepository.findById(reviewDTO.getBoardId()).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 게시글이 없습니다."));
         Review review = new Review();
         review.setContent(reviewDTO.getContent());
         review.setWriter(reviewDTO.getWriter());

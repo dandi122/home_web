@@ -35,6 +35,7 @@ public class BoardController {
 
     @PostMapping("/create")
     public String create(BoardDTO boardDTO) {
+    	System.out.println(boardDTO.toString());
         boardService.save(boardDTO);
         return "redirect:/board/list"; // 게시글 리스트 페이지로 리다이렉트
     }

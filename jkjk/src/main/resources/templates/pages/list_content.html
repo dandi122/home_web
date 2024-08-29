@@ -1,0 +1,56 @@
+<div th:fragment="frag_index_content"  class="content-wrapper">
+
+	<div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">자유게시판</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+	<section class="content">
+        <div class="container-fluid">
+          <!-- Small boxes (Stat box) -->
+          <div class="row">
+            <div class="col-lg-12 col-12">
+            
+				<table class="table">
+					<thead class="table-warning">
+						<tr>
+							<th>No</th>
+							<th>제목</th>
+							<th>작성자</th>
+							<th>작성일시</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="board, loop : ${boards}">
+							<td th:text="${loop.count}"></td>
+							<td>
+								<a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.title}"></a>
+								<!-- 글 제목 옆에 리뷰의 총 개수를 표현해보기 -->
+								<span th:text="'('+${board.reviewCount}+')'"></span>
+							</td>
+							<td th:text="${board.writer}"></td>
+							<td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+						</tr>	
+					</tbody>
+				</table>
+					
+				<!--/* TODO 0808 3 : Post 등록 진입버튼  */-->
+				<a th:href="@{/board/create}" 
+				   class="btn btn-dark">글 작성</a>
+				   
+			</div>
+		  </div>
+	    </div>
+    </section>
+    
+</div>	

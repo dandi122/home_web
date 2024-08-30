@@ -24,15 +24,15 @@ public class Board {
     private Long id; 
     
     // 게시글의 제목
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String title; 
     
     // 게시글의 내용
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String content; 
     
     // 게시글 작성자
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String writer; 
     
     // 게시글 생성 날짜

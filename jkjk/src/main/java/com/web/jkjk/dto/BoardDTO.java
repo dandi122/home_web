@@ -1,11 +1,10 @@
 package com.web.jkjk.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.web.jkjk.entity.Board;
-import com.web.jkjk.entity.Review;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,7 +16,11 @@ import lombok.ToString;
 public class BoardDTO {
 
 	private Long id;
+	
+	@NotEmpty(message="제목은 반드시 입력해야합니다.")
 	private String title;
+	
+	@NotEmpty(message="본문 내용은 반드시 입력해야 합니다.")
 	private String content;
 	private String writer;
 	private LocalDateTime createdDate;
@@ -29,7 +32,7 @@ public class BoardDTO {
 	
 	// Entity 객체를 DTO 객체로 변환
     // 이 메서드를 사용하여 데이터를 데이터베이스에 저장할 준비
-	public BoardDTO toEntity(Board entity) {
+	public BoardDTO fromEntity(Board entity) {
         this.id = entity.getId();
         this.title = entity.getTitle();
         this.content = entity.getContent();

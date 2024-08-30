@@ -38,6 +38,9 @@ dependencies {
   	// https://mvnrepository.com/
   	// https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11
 	implementation 'com.oracle.database.jdbc:ojdbc11:23.5.0.24.07'
+	
+	//DTO 유효성 검사
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
   	
 }
 

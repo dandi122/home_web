@@ -25,8 +25,11 @@
 						<tr>
 							<th>No</th>
 							<th>제목</th>
+							<th>좋아요</th>
+							<th>싫어요</th>
 							<th>작성자</th>
 							<th>작성일시</th>
+							<th>수정일시</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -37,8 +40,11 @@
 								<!-- 글 제목 옆에 리뷰의 총 개수를 표현해보기 -->
 								<span th:text="'('+${board.reviewCount}+')'"></span>
 							</td>
+							<td th:text="${board.likes}"></td>
+							<td th:text="${board.dislikes}"></td>
 							<td th:text="${board.writer}"></td>
 							<td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+							<td th:text="${#temporals.format(board.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
 						</tr>	
 					</tbody>
 				</table>

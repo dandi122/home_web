@@ -14,6 +14,7 @@ import com.web.jkjk.repository.BoardRepository;
 import com.web.jkjk.repository.ReviewRepository;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @Service
 public class BoardService {
@@ -33,6 +34,15 @@ public class BoardService {
 		board.setWriter(boardDTO.getWriter());
         return boardRepository.save(board).getId();
 	}
+	
+	@Transactional
+	public void motify(BoardDTO boardDTO) {
+		Board board = boardRepository.findById(boardDTO.getId()).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 게시글이 없습니다."));
+		board.setTitle(boardDTO.getTitle());
+		board.setWriter(board.getWriter());
+		board.setContent(board.getContent());
+		boardRepository.save(board);
+	}
         
     
     // 특정 아이디에 해당하는 게시글을 조회하고, BoardDTO로 변환하여 반환하게하기
@@ -41,14 +51,14 @@ public class BoardService {
     	
         Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 게시글이 없습니다."));
         
-        return new BoardDTO().toEntity(board);
+        return new BoardDTO().fromEntity(board);
     }
     
     // 모든 게시글을 조회하고, BoardDTO 리스트로 변환하여 반환
     @Transactional
     public List<BoardDTO> findAll() {
         return boardRepository.findAll().stream()
-                .map(board -> new BoardDTO().toEntity(board))
+                .map(board -> new BoardDTO().fromEntity(board))
                 .collect(Collectors.toList());
     }
     
@@ -95,10 +105,40 @@ public class BoardService {
         boardRepository.save(board);
     }
     
+    
     @Transactional
     public void deleteById(Long id) {
-        boardRepository.deleteById(id);
+    	boardRepository.deleteById(id);
     }
+    
+    @Transactional
+    public Long reviewDeleteById(Long id) {
+        Review review = reviewRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        reviewRepository.deleteById(id);
+        return review.getBoard().getId();
+        
+    }
+    
+    @Transactional
+    public ReviewDTO findReviewById(Long id) {
+    	
+        Review review = reviewRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 댓글이 없습니다."));
+        
+        return new ReviewDTO().toEntity(review);
+    }
+    
+    @Transactional
+	public Long modifyReview(ReviewDTO reviewDTO) {
+		// TODO Auto-generated method stub
+		Review review = reviewRepository.findById(reviewDTO.getId()).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 댓글이 없습니다."));
+		review.setContent(reviewDTO.getContent());
+		reviewRepository.save(review);
+		return review.getBoard().getId();
+		
+	}
+
+
+	
 		
 
 }

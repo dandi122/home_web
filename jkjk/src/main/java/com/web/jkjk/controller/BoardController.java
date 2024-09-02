@@ -30,11 +30,10 @@ public class BoardController {
         model.addAttribute("boards", boardService.findAll());
         return "list"; // 게시글 리스트 뷰 반환
     }
-       
     
     // 글작성 클릭하면 create 뷰로 이동하면서 해당 객체 유효성 검사를 위해 DTO 가져가기(완료)
     @GetMapping("/create")
-    public String createForm(BoardDTO boardDTO) {
+    public String create(BoardDTO boardDTO) {
         return "create"; // 게시글 생성 폼을 반환
     }
     

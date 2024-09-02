@@ -21,7 +21,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-lg-12 col-12">
-				<form method="post" th:object="${reviewDTO}">
+				<form method="post" th:object="${reviewDTO}" th:action="@{/board/modifyreview/{reviewId}(reviewId=${reviewDTO.id})}">
 						<div th:replace="~{lib/frag :: formErrorFrag}"></div>
 						<div class="my-3">
 							<label for="content" class="form-label">본문</label>

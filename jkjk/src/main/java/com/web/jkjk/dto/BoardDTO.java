@@ -31,7 +31,6 @@ public class BoardDTO {
 	
 	
 	// Entity 객체를 DTO 객체로 변환
-    // 이 메서드를 사용하여 데이터를 데이터베이스에 저장할 준비
 	public BoardDTO fromEntity(Board entity) {
         this.id = entity.getId();
         this.title = entity.getTitle();

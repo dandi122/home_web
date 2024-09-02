@@ -22,18 +22,12 @@
             		<!-- 글작성과 수정시 url 유동적으로 쓰기 위해 action 삭제 -->	
 					<form method="post" th:object="${boardDTO}">
 						<!-- 수동설정, csrf 관련 토큰 => 403 에러 회피 전략 -->
-						<!--
-						<input type="hidden" th:name="${ _csrf.parameterName }" 
-						       th:value="${ _csrf.token }"/>
-						  -->
+						<input type="hidden" th:name="${ _csrf.parameterName }" th:value="${ _csrf.token }">
 						
 						<div th:replace="~{lib/frag :: formErrorFrag}"></div>
 						
 						<div class="my-3">
 							<label for="title" class="form-label">제목</label>
-							<!--  
-								- name="subject" 삭제 처리 : PostForm에서 접근 가능하므로 없어도 된다 
-							    - th:field="*{subject}"  : 오류 발생시 값 복원 때문에 진행 -->
 							<input type="text"  id="title" name="title" th:field="*{title}" class="form-control" placeholder="제목을 입력하세요">
 						</div>
 						<div class="my-3">

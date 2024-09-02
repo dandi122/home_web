@@ -25,6 +25,14 @@ public class BoardService {
 	@Autowired
 	private ReviewRepository reviewRepository;
 	
+	// 모든 게시글을 조회하고, BoardDTO 리스트로 변환하여 반환
+    @Transactional
+    public List<BoardDTO> findAll() {
+        return boardRepository.findAll().stream()
+                .map(board -> new BoardDTO().fromEntity(board))
+                .collect(Collectors.toList());
+    }
+	
 	// 게시글을 저장하고 저장된 게시글의 ID 반환하는 메소드 만들기
 	@Transactional
 	public Long save(BoardDTO boardDTO) {
@@ -35,12 +43,13 @@ public class BoardService {
         return boardRepository.save(board).getId();
 	}
 	
+	// 게시글 수정 메소드
 	@Transactional
 	public void motify(BoardDTO boardDTO) {
 		Board board = boardRepository.findById(boardDTO.getId()).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 게시글이 없습니다."));
 		board.setTitle(boardDTO.getTitle());
-		board.setWriter(board.getWriter());
-		board.setContent(board.getContent());
+		board.setWriter(boardDTO.getWriter());
+		board.setContent(boardDTO.getContent());
 		boardRepository.save(board);
 	}
         
@@ -54,13 +63,6 @@ public class BoardService {
         return new BoardDTO().fromEntity(board);
     }
     
-    // 모든 게시글을 조회하고, BoardDTO 리스트로 변환하여 반환
-    @Transactional
-    public List<BoardDTO> findAll() {
-        return boardRepository.findAll().stream()
-                .map(board -> new BoardDTO().fromEntity(board))
-                .collect(Collectors.toList());
-    }
     
     // 댓글 저장 메서드
     @Transactional
@@ -105,12 +107,13 @@ public class BoardService {
         boardRepository.save(board);
     }
     
-    
+    // 게시글 삭제하는 메서드
     @Transactional
     public void deleteById(Long id) {
     	boardRepository.deleteById(id);
     }
     
+    //리뷰 삭제하는 메서드
     @Transactional
     public Long reviewDeleteById(Long id) {
         Review review = reviewRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
@@ -119,14 +122,16 @@ public class BoardService {
         
     }
     
+    // 리뷰id로 리뷰 찾는 메서드 
     @Transactional
     public ReviewDTO findReviewById(Long id) {
     	
         Review review = reviewRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 id에 해당하는 댓글이 없습니다."));
         
-        return new ReviewDTO().toEntity(review);
+        return new ReviewDTO().fromEntity(review);
     }
     
+    // 리뷰 수정하는 메서드
     @Transactional
 	public Long modifyReview(ReviewDTO reviewDTO) {
 		// TODO Auto-generated method stub

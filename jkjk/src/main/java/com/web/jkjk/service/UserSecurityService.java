@@ -33,13 +33,13 @@ public class UserSecurityService implements UserDetailsService{
 		// 권한 부여
 		// 권한 : admin, 일반, username을 기반으로 부여
 		
-		Optional<SnsUser> _user = this.userRepository.findByUsername(username);
-        if (_user.isEmpty()) {
-            throw new UsernameNotFoundException("사용자를 찾을수 없습니다.");
-        }
-        SnsUser user = _user.get();
-		// 사용자 획득
-//		SnsUser user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("해당 username에 해당하는 사용자가 없습니다."));
+//		Optional<SnsUser> _user = this.userRepository.findByUsername(username);
+//        if (_user.isEmpty()) {
+//            throw new UsernameNotFoundException("사용자를 찾을수 없습니다.");
+//        }
+//        SnsUser user = _user.get();
+		// 요렇게도 해보기
+		SnsUser user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("해당 username에 해당하는 사용자가 없습니다."));
 		
         
 		

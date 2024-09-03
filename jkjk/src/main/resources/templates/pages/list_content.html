@@ -1,61 +1,133 @@
-<div th:fragment="frag_index_content"  class="content-wrapper">
+<div th:fragment="frag_index_content" class="content-wrapper">
 
-	<div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0">자유게시판</h1>
-            </div>
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="/">Home</a></li>
-              </ol>
-            </div>
-          </div>
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">자유게시판</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+          </ol>
         </div>
       </div>
-      
-	<section class="content">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-lg-12 col-12">
-            
-				<table class="table">
-					<thead class="table-warning">
-						<tr>
-							<th>No</th>
-							<th>제목</th>
-							<th>좋아요</th>
-							<th>싫어요</th>
-							<th>작성자</th>
-							<th>작성일시</th>
-							<th>수정일시</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="board, loop : ${boards}">
-							<td th:text="${loop.count}"></td>
-							<td>
-								<a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.title}"></a>
-								<!-- 글 제목 옆에 리뷰의 총 개수를 표현해보기 -->
-								<span th:text="'('+${board.reviewCount}+')'"></span>
-							</td>
-							<td th:text="${board.likes}"></td>
-							<td th:text="${board.dislikes}"></td>
-							<td th:text="${board.writer}"></td>
-							<td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-							<td th:text="${#temporals.format(board.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-						</tr>	
-					</tbody>
-				</table>
-					
-				<!--/* TODO 0808 3 : Post 등록 진입버튼  */-->
-				<a th:href="@{/board/create}" 
-				   class="btn btn-dark">글 작성</a>
-				   
-			</div>
-		  </div>
-	    </div>
-    </section>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12 col-12">
+          <!-- 검색 기능 넣어보기 -->
+          <form method="get" th:action="@{/board/list2}" id="searchForm">
+            <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
+            <input type="hidden" id="page" name="page" th:value="${paging.number}">
+            <div class="card-header">
+              <div class="card-tools">
+                <div class="input-group input-group-sm" style="width: 300px;">
+                  <input type="text" id="search_keyword" class="form-control float-right" placeholder="Search">
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-default" id="searchBtn">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <table class="table">
+            <thead class="table-warning">
+              <tr>
+                <th>No</th>
+                <th>제목</th>
+                <th>좋아요</th>
+                <th>싫어요</th>
+                <th>작성자</th>
+                <th>작성일시</th>
+                <th>수정일시</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="board, loop : ${paging}">
+                <td th:text="${loop.count}"></td>
+                <td>
+                  <a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.title}"></a>
+                  <!-- 글 제목 옆에 리뷰의 총 개수를 표현해보기 -->
+                  <span th:text="'('+${board.reviewCount}+')'"></span>
+                </td>
+                <td th:text="${board.likes}"></td>
+                <td th:text="${board.dislikes}"></td>
+                <td th:text="${board.writer}"></td>
+                <td th:text="${#temporals.format(board.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${#temporals.format(board.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="card-footer clearfix d-flex justify-content-center">
+            <ul class="pagination pagination-sm m-0">
+              <!-- 이전 페이지가 없다면 disabled -->
+              <li class="page-item" th:classappend="${ !paging.hasPrevious } ? 'disabled'">
+                <!-- 현재 페이지 -1 페이지로 이동 -->
+                <!-- <a class="page-link" th:href="@{|?page=${paging.number-1}|}">«</a>  -->
+                <!-- 검색후에도 페이징이 적절히 적용되도록 js 사용 -->
+                <a class="page-link" href="javascript:void(0)" th:data-page="${ paging.number-1 }">
+                    <span>«</span>
+                </a>
+              </li>
+
+              <li th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
+                th:classappend="${page == paging.number} ? 'active'"
+                th:if="${ paging.number-5 <= page and page <= paging.number+5 }" class="page-item">
+                <!-- <a class="page-link" th:href="@{|?page=${page}|}" th:text="${page+1}"></a> -->
+                <a class="page-link" href="javascript:void(0)" th:data-page="${ page }" th:text="${page+1}"></a>
+              </li>
+
+              <li class="page-item" th:classappend="${ !paging.hasNext } ? 'disabled'">
+                <!-- <a class="page-link" th:href="@{|?page=${paging.number+1}|}">»</a> -->
+                <a class="page-link" href="javascript:void(0)" th:data-page="${ paging.number+1 }">
+                    <span>»</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <a th:href="@{/board/create}" class="btn btn-dark">글 작성</a>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 자바스크립트 -->
+  <script type="text/javascript">
+    //현 문서상에 존재하는 모든 요수 중에 클레스 값이 page-link인 모든 요소를 찾아라
+  	const links = document.getElementsByClassName("page-link");
+    console.log("페이징 요소의 개수  ", links.length);
     
-</div>	
+    Array.from(links).forEach( (link) => {
+      // 요소 하나하나에 클릭 이벤트 등록
+      link.addEventListener("click", function(e) {
+        console.log(this.dataset.page); // 페이지 번호
+        document.getElementById("page").value = this.dataset.page;
+        document.getElementById("searchForm").submit();
+      })
+    })
+
+    //검색버튼 클릭 이벤트 잡아서 처리해보기
+    const searchBtn = document.getElementById("searchBtn");
+    searchBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      console.log("버튼 클릭 이벤트 클릭")
+      //검색어 입력태그를 특정, 검색업값 가져옮
+      document.getElementById("keyword").value = document.getElementById("search_keyword").value;
+      //페이지 번호 입력 태그에 세팅
+      document.getElementById("page").value = 0;
+      //폼태그 특정해서 서버 전송
+      document.getElementById("searchForm").submit();
+      return false;
+    })
+  
+  </script>
+
+</div>

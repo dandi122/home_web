@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.web.jkjk.dto.BoardDTO;
@@ -13,6 +18,10 @@ import com.web.jkjk.entity.Review;
 import com.web.jkjk.repository.BoardRepository;
 import com.web.jkjk.repository.ReviewRepository;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -25,6 +34,36 @@ public class BoardService {
 	@Autowired
 	private ReviewRepository reviewRepository;
 	
+	private final int PAGE_SIZE = 10;
+	
+	// TODO 2024.09.03 #2 : 페이징기능 구현을 위한 서비스 추가
+	public Page<BoardDTO> findAll(int page) {
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
+		return boardRepository.findAll(pageable).map(board -> new BoardDTO().fromEntity(board));
+	}
+	
+	// TODO 2024-09.03 #6 : 검색 로직 구현
+	public Page<BoardDTO> findAll(int page, String keyword) {
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
+		Specification<Board> sf = complexSearch(keyword);
+		return boardRepository.findAll(sf, pageable).map(board -> new BoardDTO().fromEntity(board));
+	}
+	
+	private Specification<Board> complexSearch(String keyword) {
+		return new Specification<>() {
+			
+			@Override
+			public Predicate toPredicate(Root<Board> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				
+//				return criteriaBuilder.like(root.get("title"), "%"+keyword+"%");
+				return criteriaBuilder.or(
+						criteriaBuilder.like(root.get("title"), "%"+keyword+"%"),
+						criteriaBuilder.like(root.get("content"), "%"+keyword+"%")
+						);
+			}
+		};
+	}
+	
 	// 모든 게시글을 조회하고, BoardDTO 리스트로 변환하여 반환
     @Transactional
     public List<BoardDTO> findAll() {
@@ -32,7 +71,7 @@ public class BoardService {
                 .map(board -> new BoardDTO().fromEntity(board))
                 .collect(Collectors.toList());
     }
-	
+    
 	// 게시글을 저장하고 저장된 게시글의 ID 반환하는 메소드 만들기
 	@Transactional
 	public Long save(BoardDTO boardDTO) {

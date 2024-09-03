@@ -1,6 +1,7 @@
 package com.web.jkjk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.web.jkjk.dto.BoardDTO;
 import com.web.jkjk.dto.ReviewDTO;
@@ -23,13 +25,33 @@ public class BoardController {
 	//즉, BoardService만 사용해서 구현
 	@Autowired
 	private BoardService boardService;
+	
+	// TODO 2024.09.03 #3 : 게시판 페이징 기능 구현
+	@GetMapping("/list")
+	public String list(Model model,
+					   @RequestParam(value="page", defaultValue = "0") int page) {
+		Page<BoardDTO> paging = boardService.findAll(page);
+		model.addAttribute("paging", paging);
+		return "list";
+	}
+	
+	// TODO 2024.09.03 #4 : 검색페이지 구현(검색어 획득, 검색 작업(서비스-레포지토리), 타임리프 전달내용(검색어, 페이징 번호)
+	@GetMapping("/list2")
+	public String list2(Model model,
+					   @RequestParam(value="page", defaultValue = "0") int page,
+					   @RequestParam(value="keyword", defaultValue = "") String keyword) {
+		Page<BoardDTO> paging = boardService.findAll(page, keyword);
+		model.addAttribute("paging", paging);
+		model.addAttribute("keyword", keyword);
+		return "list";
+	}
 		
 	// 모든 게시글을 조회하고, 모델에 추가하여 화면에 보여주기(완료)
-    @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("boards", boardService.findAll());
-        return "list"; // 게시글 리스트 뷰 반환
-    }
+//    @GetMapping("/list")
+//    public String list(Model model) {
+//        model.addAttribute("boards", boardService.findAll());
+//        return "list"; // 게시글 리스트 뷰 반환
+//    }
     
     // 글작성 클릭하면 create 뷰로 이동하면서 해당 객체 유효성 검사를 위해 DTO 가져가기(완료)
     @GetMapping("/create")

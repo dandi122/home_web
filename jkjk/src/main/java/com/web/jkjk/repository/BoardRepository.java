@@ -17,4 +17,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>{
 	//TODO 2024.09.03 #6: 검색기능 구현
 	Page<Board> findAll(Specification<Board> sf, Pageable pageable);
 	
+	//TODO 2024.09.05 #5 : 공시사항게시판만들기
+	Page<Board> findByWriter(String writer, Pageable pageable);
+	
 }

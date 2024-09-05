@@ -32,13 +32,15 @@
 							</div>
 						</div>	
 						<!-- 수정, 삭제 버튼 추가 -->
-						<div class="card my-3">
+						<div class="card my-3" th:if="${username == board.writer or username == 'admin'}">
 							<form th:action="@{/board/modify/{id}(id=${board.id})}">
 								<input type="submit" value="수정" class="btn btn-success">
 							</form>
 							<form method="GET" th:action="@{/board/delete/{id}(id=${board.id})}">
 								<input type="submit" value="삭제" class="btn btn-danger">
 							</form>
+						</div>
+						<div class="card my-3">
 							<!-- 좋아요/싫어요 버튼 및 카운트 -->
 							<form th:action="@{/board/{id}/like(id=${board.id})}" method="post">
 							     <button type="submit">👍 좋아요(<span th:text="${board.likes}">0</span>) </button>
@@ -58,8 +60,10 @@
 							<!--
 							<div th:replace="~{lib/frag :: formErrorFrag}"></div>
 							-->
+							<!-- 
 							<label for="writer">작성자:</label>
             				<input type="text" id="writer" name="writer" required>
+            				 -->
             				<label for="content">내용:</label>
             				<textarea id="content" name="content" required></textarea>
 							<button type="submit">댓글 작성</button>
@@ -72,12 +76,12 @@
 						<div class="card my-3 bg-warning" th:each="review : ${reviews}">
 							<div class="card-body">		
 								
-								<div class="card-text" th:text="${review.writer}"></div>
-								<div class="card-text" th:text="${review.content}"></div>
+								<div class="card-text" th:text="'작성자: '+${review.writer}"></div>
+								<div class="card-text" th:text="'내용: ' +${review.content}"></div>
 								<div class="card-text" th:text="${ #temporals.format( review.createdDate, 'yyyy-MM-dd HH:mm:ss') }"></div>
 																	 
 							</div>
-							<div class="card-footer">
+							<div class="card-footer" th:if="${username == review.writer or username == 'admin'}">
 								<a th:href="@{/board/modifyreview/{reviewId}(reviewId=${review.id})}" class="btn btn-info">수정</a>
 								<a th:href="@{/board/deletereview/{reviewId}(reviewId=${review.id})}" class="btn btn-danger">삭제</a>
 							</div>

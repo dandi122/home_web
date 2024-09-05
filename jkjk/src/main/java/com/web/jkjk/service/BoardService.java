@@ -1,6 +1,8 @@
 package com.web.jkjk.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +17,12 @@ import com.web.jkjk.dto.BoardDTO;
 import com.web.jkjk.dto.ReviewDTO;
 import com.web.jkjk.entity.Board;
 import com.web.jkjk.entity.Review;
+import com.web.jkjk.entity.SnsUser;
+import com.web.jkjk.entity.UserLikeDislike;
 import com.web.jkjk.repository.BoardRepository;
 import com.web.jkjk.repository.ReviewRepository;
+import com.web.jkjk.repository.UserLikeDislikeRepository;
+import com.web.jkjk.repository.UserRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -33,8 +39,19 @@ public class BoardService {
 	private BoardRepository boardRepository;
 	@Autowired
 	private ReviewRepository reviewRepository;
+	@Autowired
+	private UserLikeDislikeRepository userLikeDislikeRepository;
+	@Autowired
+	private UserRepository userRepository;
+	
 	
 	private final int PAGE_SIZE = 10;
+	
+	// TODO 2024.09.05 #5 : 공지사항 게시판 구현해보기
+	public Page<BoardDTO> findByWriter(int page) {
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
+		return boardRepository.findByWriter("admin", pageable).map(board -> new BoardDTO().fromEntity(board));
+	}
 	
 	// TODO 2024.09.03 #2 : 페이징기능 구현을 위한 서비스 추가
 	public Page<BoardDTO> findAll(int page) {
@@ -89,6 +106,7 @@ public class BoardService {
 		board.setTitle(boardDTO.getTitle());
 		board.setWriter(boardDTO.getWriter());
 		board.setContent(boardDTO.getContent());
+		board.setModifiedDate(LocalDateTime.now());
 		boardRepository.save(board);
 	}
         
@@ -130,21 +148,111 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
     
-    // 게시글에 좋아요를 추가하는 메서드
+    /**
+     * TODO 2024.09.05 #6 : 좋아요 싫어요를 유저당 한번씩만 가산할 수 있도록 구현해보기
+     */
     @Transactional
-    public void increaseLikes(Long boardId) {
+    public void increaseLikes(String username, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        board.increaseLikes();
+        
+        Optional<SnsUser> osnsUser = userRepository.findByUsername(username);
+        SnsUser snsUser = osnsUser.get();
+        
+        Optional<UserLikeDislike> existing = userLikeDislikeRepository.findBySnsUserAndBoard(snsUser, board);
+       
+        if(existing.isPresent()) {
+        	// 기존 저장된 값이 있다면,
+        	UserLikeDislike userLikeDislike = existing.get();
+        	
+        	if(userLikeDislike.isLiked()) {
+        		// 기존 저장된 값이 "좋아요(true)" 이면,
+        		board.decreaseLikes();
+        		userLikeDislike.setLiked(false);
+        		
+        	} else {
+        		// 기존 저장된 값이 "좋아요가 아님(false)" 이면,
+        		board.increaseLikes();
+        		userLikeDislike.setLiked(true);
+        	}
+        	
+        	userLikeDislikeRepository.save(userLikeDislike);
+        } else {
+        	// 저장된 값이 없다면,
+        	board.increaseLikes();
+        	
+        	UserLikeDislike userLikeDislike = new UserLikeDislike();
+        	userLikeDislike.setSnsUser(snsUser);
+        	userLikeDislike.setBoard(board);
+        	userLikeDislike.setLiked(true);
+        	userLikeDislike.setDisliked(false);
+        	userLikeDislikeRepository.save(userLikeDislike);
+        }
+        
+        boardRepository.save(board);
+        
+    }
+    
+    
+    // 게시글에 좋아요를 추가하는 메서드
+//    @Transactional
+//    public void increaseLikes(Long boardId) {
+//        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+//        board.increaseLikes();
+//        boardRepository.save(board);
+//    }
+    
+    
+    /**
+     * TODO 2024.09.05 #6 : 좋아요 싫어요를 유저당 한번씩만 가산할 수 있도록 구현해보기
+     */
+    @Transactional
+    public void increaseDislikes(String username, Long boardId) {
+    	Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        
+        Optional<SnsUser> osnsUser = userRepository.findByUsername(username);
+        SnsUser snsUser = osnsUser.get();
+        
+        Optional<UserLikeDislike> existing = userLikeDislikeRepository.findBySnsUserAndBoard(snsUser, board);
+       
+        if(existing.isPresent()) {
+        	// 기존 저장된 값이 있다면,
+        	UserLikeDislike userLikeDislike = existing.get();
+        	
+        	if(userLikeDislike.isDisliked()) {
+        		// 기존 저장된 값이 "싫어요(true)" 이면,
+        		board.decreaseDislikes();
+        		userLikeDislike.setDisliked(false);
+        		
+        	} else {
+        		// 기존 저장된 값이 "좋아요가 아님(false)" 이면,
+        		board.increaseDislikes();
+        		userLikeDislike.setDisliked(true);
+        	}
+        	
+        	userLikeDislikeRepository.save(userLikeDislike);
+        } else {
+        	// 저장된 값이 없다면,
+        	board.increaseDislikes();
+        	
+        	UserLikeDislike userLikeDislike = new UserLikeDislike();
+        	userLikeDislike.setSnsUser(snsUser);
+        	userLikeDislike.setBoard(board);
+        	userLikeDislike.setLiked(false);
+        	userLikeDislike.setDisliked(true);
+        	userLikeDislikeRepository.save(userLikeDislike);
+        }
+        
         boardRepository.save(board);
     }
     
+    
     // 게시글에 싫어요를 추가하는 메서드
-    @Transactional
-    public void increaseDislikes(Long boardId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        board.increaseDislikes();
-        boardRepository.save(board);
-    }
+//    @Transactional
+//    public void increaseDislikes(Long boardId) {
+//        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+//        board.increaseDislikes();
+//        boardRepository.save(board);
+//    }
     
     // 게시글 삭제하는 메서드
     @Transactional

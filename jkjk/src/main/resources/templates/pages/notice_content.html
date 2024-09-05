@@ -94,9 +94,9 @@
               </li>
             </ul>
           </div>
-
-          <a th:href="@{/board/create}" class="btn btn-dark">글 작성</a>
-
+		  <div th:if="${username == 'admin'}">
+          	<a th:href="@{/board/create}" class="btn btn-dark">글 작성</a>
+		  </div>
         </div>
       </div>
     </div>

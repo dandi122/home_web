@@ -1,12 +1,15 @@
 package com.web.jkjk.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +32,7 @@ public class SnsUser {
     private String email;
     
     private LocalDateTime regDate = LocalDateTime.now();
+    
+    @OneToMany(mappedBy = "snsUser", cascade = CascadeType.REMOVE)
+	private List<UserLikeDislike> userLikeDislikeList;
 }

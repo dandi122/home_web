@@ -26,14 +26,14 @@ public class UserDTO {
 	@NotEmpty(message="이메일 필수 입력 항목")
     private String email;
 	
-    private LocalDateTime regDate; 
+//    private LocalDateTime regDate; 
     
     public UserDTO fromEntity(SnsUser entity) {
 		this.id = entity.getId();
 		this.username = entity.getUsername();
-		this.password1 = entity.getPassword();
+//		this.password1 = entity.getPassword();
 		this.email = entity.getEmail();
-		this.regDate = entity.getRegDate();
+//		this.regDate = entity.getRegDate();
 		return this;
     }
     

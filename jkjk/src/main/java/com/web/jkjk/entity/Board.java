@@ -40,11 +40,14 @@ public class Board {
     private LocalDateTime createdDate = LocalDateTime.now(); 
     
     // 게시글 수정 날짜
-    @Column(nullable = false)
-    private LocalDateTime modifiedDate = LocalDateTime.now(); 
+    @Column(nullable = true)
+    private LocalDateTime modifiedDate;
     
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
 	private List<Review> reviewtList;
+    
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+	private List<UserLikeDislike> userLikeDislikeList;
     
  // 좋아요와 싫어요 카운트를 위한 필드 추가
     @Column(nullable = false)
@@ -63,6 +66,15 @@ public class Board {
         this.dislikes++;
     }
     
+    // 좋아요 감소 메소드
+    public void decreaseLikes() {
+        this.likes--;
+    }
+
+    // 싫어요 감소 메서드
+    public void decreaseDislikes() {
+        this.dislikes--;
+    }
     
     
     
